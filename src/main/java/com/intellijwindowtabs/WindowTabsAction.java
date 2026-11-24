@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public final class WindowTabsAction extends DumbAwareAction implements CustomComponentAction {
-    private record Tab(JFrame frame, String name, String path) {}
+    private record Tab(JFrame frame, String label, String projectName, String path) {}
 
     @Override
     public JComponent createCustomComponent(Presentation presentation, String place) {
@@ -132,11 +132,13 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                 availableWidth = width;
                 revalidate();
             }
+            var options = WindowTabsSettings.getInstance().getState();
             var windows = new LinkedHashMap<JFrame, Tab>();
             for (Project project : ProjectManager.getInstance().getOpenProjects()) {
                 JFrame frame = WindowManager.getInstance().getFrame(project);
                 if (frame != null) {
-                    windows.putIfAbsent(frame, new Tab(frame, project.getName(), project.getBasePath()));
+                    windows.putIfAbsent(frame, new Tab(frame, tabLabel(project, options),
+                            project.getName(), project.getBasePath()));
                 }
             }
 
@@ -155,8 +157,10 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
             JButton activeButton = null;
             for (Tab tab : tabs) {
                 boolean isActive = tab.frame() == selected;
-                JButton button = new TabButton(tab.name(), isActive);
-                button.setToolTipText(tab.path() == null ? tab.name() : tab.path());
+                JButton button = new TabButton(tab.label(), isActive);
+                button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
+                button.getAccessibleContext().setAccessibleName(
+                        tab.label().isEmpty() ? tab.projectName() : tab.label());
                 button.addActionListener(event -> activate(tab.frame()));
                 row.add(button);
                 if (isActive) activeButton = button;
@@ -172,6 +176,16 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                 if (selection != null) row.scrollRectToVisible(selection.getBounds());
             });
         }
+    }
+
+    private static String tabLabel(Project project, WindowTabsSettings.Options options) {
+        String name = options.includeProjectName ? project.getName() : "";
+        if (!options.includeBranchName) return name;
+
+        var provider = project.getService(WindowTabBranchProvider.class);
+        String branch = provider == null ? "" : provider.getBranchName();
+        if (branch.isEmpty()) return name;
+        return name.isEmpty() ? branch : name + " | " + branch;
     }
 
     private static final class TabButton extends JButton {

@@ -9,6 +9,16 @@
     <idea-version since-build="243"/>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="window-tabs-tasks.xml">com.intellij.tasks</depends>
+    <depends optional="true" config-file="window-tabs-git.xml">Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.intellijwindowtabs.WindowTabsSettings"/>
+        <applicationConfigurable parentId="tools" id="com.intellijwindowtabs.settings"
+                                 displayName="Window Tab Plugin"
+                                 instance="com.intellijwindowtabs.WindowTabsConfigurable"/>
+    </extensions>
+
     <actions>
         <action id="WindowTabs.ProjectWindows" class="com.intellijwindowtabs.WindowTabsAction" text="Project Window Tabs">
             <add-to-group group-id="MainToolbarCenter" anchor="first"/>
