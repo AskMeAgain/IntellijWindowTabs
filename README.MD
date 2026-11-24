@@ -1,11 +1,9 @@
 # Window Tabs for IntelliJ IDEA
 
-Window Tabs adds a browser-like project switcher in the main toolbar of each open IntelliJ IDEA window. Every project window shows the same set of tabs, so you can switch between open windows with one click.
+Adds tabs to the toolbar so you can switch between open projects.
 
-Each tab shows its project name. Hover over a tab to see the project's path. The active window is highlighted, and the tabs update as project windows open or close. The tab strip is centered and uses half the toolbar width when space permits. When the tabs overflow, scroll horizontally with the mouse wheel or trackpad.
+Requires IntelliJ IDEA 2026.1 or later. The build uses JDK 25 and targets Java 21 bytecode.
 
-## Build and try it
+Run `./gradlew.bat runIde` to try it or `./gradlew.bat buildPlugin` to build the ZIP.
 
-The plugin targets IntelliJ IDEA 2024.3 or later and uses Java 21.
-
-On Windows, run `./gradlew.bat runIde` from PowerShell to launch a test IDE with the plugin. Run `./gradlew.bat buildPlugin` to create a distributable ZIP in `build/distributions`.
+The build defaults to IntelliJ IDEA 2026.1. To use a local IntelliJ IDEA installation, run .\gradlew.bat runIde '-PlocalIdePath=C:/path/to/IntelliJ IDEA'.

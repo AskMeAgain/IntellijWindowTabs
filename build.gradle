@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.intellij.platform") version "2.2.1"
+    id("org.jetbrains.intellij.platform") version "2.14.0"
     id 'java'
 }
 
@@ -15,14 +15,25 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity '2024.3.2.1'
-        bundledPlugin 'com.intellij.tasks'
+        def localIdePath = providers.gradleProperty('localIdePath').orNull
+        if (localIdePath) {
+            local(localIdePath)
+        } else {
+            intellijIdea '2026.1'
+        }
         bundledPlugin 'Git4Idea'
+        bundledModule 'intellij.platform.vcs.dvcs'
+        bundledModule 'intellij.platform.vcs.dvcs.impl'
     }
+}
+
+intellijPlatform {
+    instrumentCode = false
 }
 
 patchPluginXml {
     version = project.getVersion()
+    sinceBuild = '261'
     untilBuild = provider { null }
     changeNotes = project.file("marketplace-changenotes.html").text
     pluginDescription = project.file("marketplace-description.html").text
@@ -34,8 +45,12 @@ test {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
 }
 
 signPlugin {

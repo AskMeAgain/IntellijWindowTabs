@@ -6,11 +6,9 @@
 
     <description>Switch between open IntelliJ IDEA project windows using a shared tab strip at the top of every window.</description>
 
-    <idea-version since-build="243"/>
+    <idea-version since-build="261"/>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true" config-file="window-tabs-tasks.xml">com.intellij.tasks</depends>
-    <depends optional="true" config-file="window-tabs-git.xml">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.intellijwindowtabs.WindowTabsSettings"/>
