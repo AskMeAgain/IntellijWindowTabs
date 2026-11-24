@@ -1,16 +1,18 @@
 <idea-plugin>
-    <id>intellij.plugin.template</id>
-    <name>IntellijPluginTemplate</name>
+    <id>com.intellijwindowtabs</id>
+    <name>Window Tabs</name>
     <version>0.0.1</version>
-    <vendor url="github url">You</vendor>
+    <vendor>Window Tabs</vendor>
 
-    <description>
-        <!--........................this will be replaced by the pathPluginXml gradle task...........................-->
-    </description>
+    <description>Switch between open IntelliJ IDEA project windows using a shared tab strip at the top of every window.</description>
 
-    <idea-version since-build="213.4928.7"/>
+    <idea-version since-build="243"/>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.java</depends>
+    <actions>
+        <action id="WindowTabs.ProjectWindows" class="com.intellijwindowtabs.WindowTabsAction" text="Project Window Tabs">
+            <add-to-group group-id="MainToolbarCenter" anchor="first"/>
+        </action>
+    </actions>
 
 </idea-plugin>

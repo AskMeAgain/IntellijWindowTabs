@@ -3,8 +3,8 @@ plugins {
     id 'java'
 }
 
-group 'intellij.plugin.template'
-version System.getenv("RELEASE_VERSION")
+group 'com.intellijwindowtabs'
+version System.getenv("RELEASE_VERSION") ?: '0.1.0'
 
 repositories {
     mavenCentral()
@@ -16,26 +16,14 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdeaCommunity '2024.3.2.1'
-
-        bundledPlugin 'com.intellij.java'
-        bundledPlugin 'com.intellij.tasks'
-    }
-}
-
-intellijPlatform {
-    pluginConfiguration {
-        vendor {
-            name = 'AskMeAgain'
-            email = '-'
-            url = 'https://github.com/AskMeAgain/IntellijPluginTemplate'
-        }
     }
 }
 
 patchPluginXml {
     version = project.getVersion()
-    changeNotes = new File("marketplace-changenotes.html").text
-    pluginDescription = new File("marketplace-description.html").text
+    untilBuild = provider { null }
+    changeNotes = project.file("marketplace-changenotes.html").text
+    pluginDescription = project.file("marketplace-description.html").text
 }
 
 test {

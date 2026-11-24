@@ -1,78 +1,11 @@
-# Intellij Plugin Template
+# Window Tabs for IntelliJ IDEA
 
-This is a complete template to push your Plugins much faster to the store. 
-Updated to use the new pluugin system 2.0.0 from intellij & java 17
+Window Tabs adds a browser-like project switcher in the main toolbar of each open IntelliJ IDEA window. Every project window shows the same set of tabs, so you can switch between open windows with one click.
 
-Everything is already setup and an explanation for all needed manual steps is on the bottom.
+Each tab shows its project name. Hover over a tab to see the project's path. The active window is highlighted, and the tabs update as project windows open or close. The tab strip is centered and uses half the toolbar width when space permits. When the tabs overflow, scroll horizontally with the mouse wheel or trackpad.
 
-## Setup
+## Build and try it
 
-### Download template
+The plugin targets IntelliJ IDEA 2024.3 or later and uses Java 21.
 
-In Github just click the green "Use this template" button
-
-### Develop your plugin
-
-Develop the plugin :)
-
-### Create a manual release of the plugin
-
-1. go to the following page (create an account if you havent)
-
-       https://plugins.jetbrains.com/author/me
-
-2. click on your profile
-3. Upload plugin
-4. fill out everything (use unstable channel for the manual release)
-
-### Initialize secrets
-
-1. execute the scripts to create all needed files. Keep the password in mind!
-
-       ./create-secrets.sh
-
-2. go to your intellij author page and create a new publish token
-
-       https://plugins.jetbrains.com/author/me
-
-3. click on your profile
-4. my profile
-5. my tokens
-6. Generate new Token
-
-### Setup GitHub CI variables
-
-1. Go to "Settings" on your new GitHub repository
-2. Secrets
-3. Actions
-4. New Repository Secret
-5. Create the following 4 secrets
-    * | Name                 | Content                                                     |
-      |----------------------|--------------------------------------------------------------|
-      | CERTIFICATE_CHAIN    | The file is called CERTIFICATE_CHAIN.crt in the secrets folder |
-      | PRIVATE_KEY          | The file is called PRIVATE_KEY.pem inside the secrets folder |
-      | PRIVATE_KEY_PASSWORD | the password you entered while executing create-secrets.sh  |
-      | PUBLISH_TOKEN        | The token from the intellij website                         |
-    * For the files, just copy the content into the window text field without any formatting
-
-### Create a store page
-
-Fill out `marketplace-description.html`. This will be shown in the Intellij Marketplace store page
-
-For updates, change `marketplace-changenotes.html`.
-
-### How to make a release
-
-If you have created your first manual release, you can for now create all released by hand
-
-0. Dont forget to fill out `marketplace-changenotes.html`
-1. Just create a new GitHub release
-2. The git tag will be your version. 
-3. Name it "1.0.0" or "0.1.2" or "10.0.123"
-4. It will always be pushed to Stable (the marketplace)
-5. If the upload worked you will receive an email
-6. You will receive another email if the manual approval went through.
-7. Profit!
-
-
-
+On Windows, run `./gradlew.bat runIde` from PowerShell to launch a test IDE with the plugin. Run `./gradlew.bat buildPlugin` to create a distributable ZIP in `build/distributions`.
