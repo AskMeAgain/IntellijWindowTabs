@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.intellijwindowtabs</id>
+    <id>io.github.askmeagain.windowtabs</id>
     <name>Window Tabs</name>
     <version>0.0.1</version>
     <vendor>AskMeAgain</vendor>
