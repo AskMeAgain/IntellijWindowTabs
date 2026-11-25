@@ -1,4 +1,4 @@
-package io.github.askmeagain.windowtabs;
+package io.github.askmeagain.projecttabbar;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -38,7 +38,7 @@ import java.awt.Window;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public final class WindowTabsAction extends DumbAwareAction implements CustomComponentAction {
+public final class ProjectTabBarAction extends DumbAwareAction implements CustomComponentAction {
     private record Tab(JFrame frame, String label, String projectName, String path) {}
 
     @Override
@@ -123,7 +123,7 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                 return;
             }
             var context = SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project).build();
-            action.actionPerformed(AnActionEvent.createFromAnAction(action, null, "WindowTabs.Toolbar", context));
+            action.actionPerformed(AnActionEvent.createFromAnAction(action, null, "ProjectTabBar.Toolbar", context));
         }
 
         private int remainingWidth() {
@@ -165,7 +165,7 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                 availableWidth = width;
                 revalidate();
             }
-            var options = WindowTabsSettings.getInstance().getState();
+            var options = ProjectTabBarSettings.getInstance().getState();
             var windows = new LinkedHashMap<JFrame, Tab>();
             for (Project project : ProjectManager.getInstance().getOpenProjects()) {
                 JFrame frame = WindowManager.getInstance().getFrame(project);
@@ -212,11 +212,11 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
         }
     }
 
-    private static String tabLabel(Project project, WindowTabsSettings.Options options) {
+    private static String tabLabel(Project project, ProjectTabBarSettings.Options options) {
         String name = options.includeProjectName ? project.getName() : "";
         if (!options.includeBranchName) return name;
 
-        var provider = project.getService(WindowTabBranchProvider.class);
+        var provider = project.getService(ProjectTabBranchProvider.class);
         String branch = provider == null ? "" : provider.getBranchName();
         if (branch.isEmpty()) return name;
         return name.isEmpty() ? branch : name + " | " + branch;

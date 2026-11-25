@@ -1,6 +1,6 @@
 <idea-plugin>
-    <id>io.github.askmeagain.windowtabs</id>
-    <name>Window Tabs</name>
+    <id>io.github.askmeagain.projecttabbar</id>
+    <name>Project Tab Bar</name>
     <version>0.0.1</version>
     <vendor>AskMeAgain</vendor>
 
@@ -11,14 +11,14 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="io.github.askmeagain.windowtabs.WindowTabsSettings"/>
-        <applicationConfigurable parentId="tools" id="com.intellijwindowtabs.settings"
-                                 displayName="Window Tab Plugin"
-                                 instance="io.github.askmeagain.windowtabs.WindowTabsConfigurable"/>
+        <applicationService serviceImplementation="io.github.askmeagain.projecttabbar.ProjectTabBarSettings"/>
+        <applicationConfigurable parentId="tools" id="io.github.askmeagain.projecttabbar.settings"
+                                 displayName="Project Tab Bar"
+                                 instance="io.github.askmeagain.projecttabbar.ProjectTabBarConfigurable"/>
     </extensions>
 
     <actions>
-        <action id="WindowTabs.ProjectWindows" class="io.github.askmeagain.windowtabs.WindowTabsAction" text="Project Window Tabs">
+        <action id="ProjectTabBar.ProjectWindows" class="io.github.askmeagain.projecttabbar.ProjectTabBarAction" text="Project Tab Bar">
             <add-to-group group-id="MainToolbarCenter" anchor="first"/>
         </action>
     </actions>

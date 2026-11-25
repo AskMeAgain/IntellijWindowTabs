@@ -1,4 +1,4 @@
-package io.github.askmeagain.windowtabs;
+package io.github.askmeagain.projecttabbar;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -7,7 +7,7 @@ import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
 
 @State(name = "WindowTabsSettings", storages = @Storage("windowTabs.xml"))
-public final class WindowTabsSettings implements PersistentStateComponent<WindowTabsSettings.Options> {
+public final class ProjectTabBarSettings implements PersistentStateComponent<ProjectTabBarSettings.Options> {
     public static final class Options {
         public boolean includeProjectName = true;
         public boolean includeBranchName = true;
@@ -15,8 +15,8 @@ public final class WindowTabsSettings implements PersistentStateComponent<Window
 
     private Options options = new Options();
 
-    static WindowTabsSettings getInstance() {
-        return ApplicationManager.getApplication().getService(WindowTabsSettings.class);
+    static ProjectTabBarSettings getInstance() {
+        return ApplicationManager.getApplication().getService(ProjectTabBarSettings.class);
     }
 
     @Override

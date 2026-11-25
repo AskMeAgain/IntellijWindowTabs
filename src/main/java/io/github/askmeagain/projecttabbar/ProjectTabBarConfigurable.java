@@ -1,4 +1,4 @@
-package io.github.askmeagain.windowtabs;
+package io.github.askmeagain.projecttabbar;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.components.JBCheckBox;
@@ -7,13 +7,13 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 
-public final class WindowTabsConfigurable implements Configurable {
+public final class ProjectTabBarConfigurable implements Configurable {
     private final JBCheckBox projectName = new JBCheckBox("include project name in tab");
     private final JBCheckBox branchName = new JBCheckBox("include branch name in tab");
 
     @Override
     public @NotNull String getDisplayName() {
-        return "Window Tab Plugin";
+        return "Project Tab Bar";
     }
 
     @Override
@@ -27,21 +27,21 @@ public final class WindowTabsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        var options = WindowTabsSettings.getInstance().getState();
+        var options = ProjectTabBarSettings.getInstance().getState();
         return projectName.isSelected() != options.includeProjectName
                 || branchName.isSelected() != options.includeBranchName;
     }
 
     @Override
     public void apply() {
-        var options = WindowTabsSettings.getInstance().getState();
+        var options = ProjectTabBarSettings.getInstance().getState();
         options.includeProjectName = projectName.isSelected();
         options.includeBranchName = branchName.isSelected();
     }
 
     @Override
     public void reset() {
-        var options = WindowTabsSettings.getInstance().getState();
+        var options = ProjectTabBarSettings.getInstance().getState();
         projectName.setSelected(options.includeProjectName);
         branchName.setSelected(options.includeBranchName);
     }

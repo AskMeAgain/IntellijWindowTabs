@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group 'windowtabs'
+group 'projecttabbar'
 version System.getenv("RELEASE_VERSION") ?: '0.1.0'
 
 repositories {

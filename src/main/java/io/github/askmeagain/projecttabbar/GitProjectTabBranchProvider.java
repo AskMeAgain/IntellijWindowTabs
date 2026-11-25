@@ -1,4 +1,4 @@
-package io.github.askmeagain.windowtabs;
+package io.github.askmeagain.projecttabbar;
 
 import com.intellij.openapi.project.Project;
 import git4idea.repo.GitRepository;
@@ -6,10 +6,10 @@ import git4idea.repo.GitRepositoryManager;
 
 import java.util.Comparator;
 
-public final class GitWindowTabBranchProvider implements WindowTabBranchProvider {
+public final class GitProjectTabBranchProvider implements ProjectTabBranchProvider {
     private final Project project;
 
-    public GitWindowTabBranchProvider(Project project) {
+    public GitProjectTabBranchProvider(Project project) {
         this.project = project;
     }
 

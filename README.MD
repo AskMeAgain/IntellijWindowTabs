@@ -1,8 +1,8 @@
-# Window Tabs for IntelliJ IDEA
+# Project Tab Bar for IntelliJ IDEA
 
 Adds tabs to the toolbar so you can switch between open projects.
 
-![Window Tabs demo in IntelliJ IDEA](./example.gif)
+![Project Tab Bar demo in IntelliJ IDEA](./project-tab-bar-demo.gif)
 
 Requires IntelliJ IDEA 2026.1 or later. The build uses JDK 25 and targets Java 21 bytecode.
 
