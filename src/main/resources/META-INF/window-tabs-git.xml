@@ -1,6 +1,6 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceInterface="com.intellijwindowtabs.WindowTabBranchProvider"
-                        serviceImplementation="com.intellijwindowtabs.GitWindowTabBranchProvider"/>
+        <projectService serviceInterface="io.github.askmeagain.windowtabs.WindowTabBranchProvider"
+                        serviceImplementation="io.github.askmeagain.windowtabs.GitWindowTabBranchProvider"/>
     </extensions>
 </idea-plugin>

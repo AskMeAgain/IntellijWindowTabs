@@ -2,7 +2,7 @@
     <id>com.intellijwindowtabs</id>
     <name>Window Tabs</name>
     <version>0.0.1</version>
-    <vendor>Window Tabs</vendor>
+    <vendor>AskMeAgain</vendor>
 
     <description>Switch between open IntelliJ IDEA project windows using a shared tab strip at the top of every window.</description>
 
@@ -11,14 +11,14 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.intellijwindowtabs.WindowTabsSettings"/>
+        <applicationService serviceImplementation="io.github.askmeagain.windowtabs.WindowTabsSettings"/>
         <applicationConfigurable parentId="tools" id="com.intellijwindowtabs.settings"
                                  displayName="Window Tab Plugin"
-                                 instance="com.intellijwindowtabs.WindowTabsConfigurable"/>
+                                 instance="io.github.askmeagain.windowtabs.WindowTabsConfigurable"/>
     </extensions>
 
     <actions>
-        <action id="WindowTabs.ProjectWindows" class="com.intellijwindowtabs.WindowTabsAction" text="Project Window Tabs">
+        <action id="WindowTabs.ProjectWindows" class="io.github.askmeagain.windowtabs.WindowTabsAction" text="Project Window Tabs">
             <add-to-group group-id="MainToolbarCenter" anchor="first"/>
         </action>
     </actions>
