@@ -1,6 +1,14 @@
 package com.intellijwindowtabs;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -8,7 +16,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.JButton;
@@ -25,8 +32,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.Point;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
@@ -45,9 +50,10 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
     public void actionPerformed(AnActionEvent event) {}
 
     private static final class Tabs extends JPanel {
-        private final JPanel row = new JPanel(new FlowLayout(FlowLayout.LEADING, JBUI.scale(3), JBUI.scale(1)));
+        private final JPanel row = new JPanel(new FlowLayout(FlowLayout.TRAILING, JBUI.scale(3), JBUI.scale(1)));
         private final JScrollPane viewport = new JScrollPane(row, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        private final ActionButton newWindowButton = createWorktreeButton();
         private int availableWidth;
         private final Timer timer = new Timer(500, event -> refresh());
         private List<Tab> displayed = List.of();
@@ -71,17 +77,53 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                     event.consume();
                 }
             });
-            add(viewport);
+            add(viewport, BorderLayout.CENTER);
+            add(newWindowButton, BorderLayout.LINE_END);
         }
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(Math.max(JBUI.scale(32), remainingWidth()), JBUI.scale(29));
+            int buttonWidth = newWindowButton.getPreferredSize().width;
+            int contentWidth = row.getComponentCount() == 0 ? 0 : row.getPreferredSize().width;
+            return new Dimension(Math.max(buttonWidth, Math.min(contentWidth + buttonWidth, remainingWidth())),
+                    JBUI.scale(29));
         }
 
         @Override
         public Dimension getMinimumSize() {
-            return new Dimension(JBUI.scale(32), JBUI.scale(29));
+            return newWindowButton.getPreferredSize();
+        }
+
+        private ActionButton createWorktreeButton() {
+            AnAction action = new AnAction("New Worktree", "Create a Git worktree", AllIcons.General.Add) {
+                @Override
+                public void actionPerformed(AnActionEvent event) {
+                    openWorktree();
+                }
+            };
+            int size = JBUI.scale(29);
+            return new ActionButton(action, action.getTemplatePresentation().clone(),
+                    ActionPlaces.MAIN_TOOLBAR, new Dimension(size, size));
+        }
+
+        private void openWorktree() {
+            Window frame = SwingUtilities.getWindowAncestor(this);
+            Project project = null;
+            for (Project candidate : ProjectManager.getInstance().getOpenProjects()) {
+                if (WindowManager.getInstance().getFrame(candidate) == frame) {
+                    project = candidate;
+                    break;
+                }
+            }
+            if (project == null) return;
+
+            var action = ActionManager.getInstance().getAction("Git.CreateNewWorkingTree");
+            if (action == null) {
+                Messages.showInfoMessage(project, "This IDE does not provide the Git worktree action.", "New Worktree");
+                return;
+            }
+            var context = SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project).build();
+            action.actionPerformed(AnActionEvent.createFromAnAction(action, null, "WindowTabs.Toolbar", context));
         }
 
         private int remainingWidth() {
@@ -91,19 +133,10 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
 
             Container toolbar = section.getParent();
             if (toolbar.getWidth() == 0) return JBUI.scale(180);
-            int left = 0;
-            int right = 0;
-            boolean beforeCenter = true;
+            int width = toolbar.getWidth() - JBUI.scale(40);
             for (Component sibling : toolbar.getComponents()) {
-                if (sibling == section) {
-                    beforeCenter = false;
-                } else if (sibling.isVisible()) {
-                    if (beforeCenter) left += sibling.getPreferredSize().width;
-                    else right += sibling.getPreferredSize().width;
-                }
+                if (sibling != section && sibling.isVisible()) width -= sibling.getPreferredSize().width;
             }
-            int width = Math.min(toolbar.getWidth() / 2,
-                    toolbar.getWidth() - 2 * Math.max(left, right) - JBUI.scale(40));
             width -= section.getInsets().left + section.getInsets().right;
             for (Component sibling : section.getComponents()) {
                 if (sibling != this && sibling.isVisible() && !SwingUtilities.isDescendingFrom(this, sibling)) {
@@ -166,6 +199,7 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
                 if (isActive) activeButton = button;
             }
             row.revalidate();
+            revalidate();
             row.repaint();
             JButton selection = activeButton;
             SwingUtilities.invokeLater(() -> {
@@ -197,11 +231,9 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
             setFont(JBUI.CurrentTheme.EditorTabs.font());
             setBorder(JBUI.Borders.empty(0, 10));
             setBorderPainted(false);
-            setFocusPainted(false);
             setContentAreaFilled(false);
             setOpaque(false);
             setRolloverEnabled(true);
-            if (active) setForeground(JBColor.namedColor("Button.default.foreground", JBColor.WHITE));
         }
 
         @Override
@@ -212,25 +244,18 @@ public final class WindowTabsAction extends DumbAwareAction implements CustomCom
 
         @Override
         protected void paintComponent(Graphics graphics) {
-            Graphics2D fill = (Graphics2D) graphics.create();
-            try {
-                fill.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                boolean emphasized = getModel().isRollover() || hasFocus();
-                if (active) {
-                    fill.setColor(JBColor.namedColor(
-                            emphasized ? "Button.default.focusedBackground" : "Button.default.startBackground",
-                            JBUI.CurrentTheme.EditorTabs.underlineColor()));
-                } else {
-                    fill.setColor(JBColor.namedColor(
-                            emphasized ? "ActionButton.pressedBackground" : "ActionButton.hoverBackground",
-                            new JBColor(0xE5E6E8, 0x414347)));
-                }
-                int arc = JBUI.scale(8);
-                fill.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
-            } finally {
-                fill.dispose();
-            }
             super.paintComponent(graphics);
+            if (!active) return;
+
+            Graphics underline = graphics.create();
+            try {
+                underline.setColor(JBUI.CurrentTheme.EditorTabs.underlineColor());
+                int inset = getInsets().left;
+                int thickness = JBUI.scale(2);
+                underline.fillRect(inset, getHeight() - thickness, getWidth() - inset - getInsets().right, thickness);
+            } finally {
+                underline.dispose();
+            }
         }
     }
 
