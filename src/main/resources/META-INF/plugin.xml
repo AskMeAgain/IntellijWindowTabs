@@ -9,6 +9,7 @@
     <idea-version since-build="261"/>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="project-tab-bar-git.xml">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="io.github.askmeagain.projecttabbar.ProjectTabBarSettings"/>
