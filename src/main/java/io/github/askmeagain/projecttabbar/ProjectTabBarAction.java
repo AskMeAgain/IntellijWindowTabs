@@ -32,9 +32,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -58,6 +62,7 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
         private final Timer timer = new Timer(500, event -> refresh());
         private List<Tab> displayed = List.of();
         private Window selected;
+        private boolean closeButtonsDisplayed;
 
         private Tabs() {
             super(new BorderLayout());
@@ -181,27 +186,66 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
             }
             if (active == null && windows.containsKey(selected)) active = selected;
             List<Tab> tabs = List.copyOf(windows.values());
-            if (tabs.equals(displayed) && active == selected) return;
+            if (tabs.equals(displayed) && active == selected && closeButtonsDisplayed == options.addCloseButton) return;
+
+            closeButtonsDisplayed = options.addCloseButton;
 
             displayed = tabs;
             selected = active;
             Point scrollPosition = viewport.getViewport().getViewPosition();
             row.removeAll();
-            JButton activeButton = null;
+            JComponent activeTab = null;
             for (Tab tab : tabs) {
                 boolean isActive = tab.frame() == selected;
-                JButton button = new TabButton(tab.label(), isActive);
+                JButton button = new TabButton(tab.label(), closeButtonsDisplayed);
                 button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
                 button.getAccessibleContext().setAccessibleName(
                         tab.label().isEmpty() ? tab.projectName() : tab.label());
                 button.addActionListener(event -> activate(tab.frame()));
-                row.add(button);
-                if (isActive) activeButton = button;
+                var middleClick = new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent event) {
+                        if (SwingUtilities.isMiddleMouseButton(event)
+                                && ProjectTabBarSettings.getInstance().getState().allowMiddleClickClose) {
+                            closeWindow(tab.frame());
+                        }
+                    }
+                };
+                button.addMouseListener(middleClick);
+
+                JPanel tabPanel = new TabPanel(isActive);
+                tabPanel.addMouseListener(middleClick);
+                tabPanel.add(button, BorderLayout.CENTER);
+                if (closeButtonsDisplayed) {
+                    var icon = AllIcons.Actions.Close;
+                    JButton close = new JButton(icon);
+                    close.setBorder(JBUI.Borders.empty());
+                    close.setBorderPainted(false);
+                    close.setPreferredSize(new Dimension(icon.getIconWidth() + JBUI.scale(2),
+                            icon.getIconHeight() + JBUI.scale(4)));
+                    close.setContentAreaFilled(false);
+                    close.setToolTipText("Close " + tab.projectName());
+                    close.getAccessibleContext().setAccessibleName(close.getToolTipText());
+                    close.addMouseListener(middleClick);
+                    close.addActionListener(event -> {
+                        if (ProjectTabBarSettings.getInstance().getState().addCloseButton) {
+                            closeWindow(tab.frame());
+                        }
+                    });
+                    JPanel closeArea = new JPanel(new GridBagLayout());
+                    closeArea.setOpaque(false);
+                    closeArea.setBorder(JBUI.Borders.empty(0, 0, 0, 10));
+                    closeArea.addMouseListener(middleClick);
+                    closeArea.add(close);
+                    tabPanel.add(closeArea, BorderLayout.LINE_END);
+                }
+                row.add(tabPanel);
+                if (isActive) activeTab = tabPanel;
             }
             row.revalidate();
             revalidate();
             row.repaint();
-            JButton selection = activeButton;
+            JComponent selection = activeTab;
             SwingUtilities.invokeLater(() -> {
                 if (!isDisplayable() || (selection != null && selection.getParent() != row)) return;
                 var view = viewport.getViewport();
@@ -223,13 +267,13 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
     }
 
     private static final class TabButton extends JButton {
-        private final boolean active;
+        private final boolean compact;
 
-        private TabButton(String label, boolean active) {
+        private TabButton(String label, boolean compact) {
             super(label);
-            this.active = active;
+            this.compact = compact;
             setFont(JBUI.CurrentTheme.EditorTabs.font());
-            setBorder(JBUI.Borders.empty(0, 10));
+            setBorder(compact ? JBUI.Borders.empty(0, 18, 0, 0) : JBUI.Borders.empty(0, 10));
             setBorderPainted(false);
             setContentAreaFilled(false);
             setOpaque(false);
@@ -238,24 +282,43 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
 
         @Override
         public Dimension getPreferredSize() {
-            Dimension size = super.getPreferredSize();
-            return new Dimension(size.width, JBUI.scale(27));
+            int width = super.getPreferredSize().width;
+            if (compact) {
+                var insets = getInsets();
+                width = getFontMetrics(getFont()).stringWidth(getText()) + insets.left + insets.right;
+            }
+            return new Dimension(width, JBUI.scale(27));
+        }
+    }
+
+    private static final class TabPanel extends JPanel {
+        private final boolean active;
+
+        private TabPanel(boolean active) {
+            super(new BorderLayout());
+            this.active = active;
+            setOpaque(false);
         }
 
         @Override
-        protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
+        protected void paintChildren(Graphics graphics) {
+            super.paintChildren(graphics);
             if (!active) return;
 
             Graphics underline = graphics.create();
             try {
                 underline.setColor(JBUI.CurrentTheme.EditorTabs.underlineColor());
-                int inset = getInsets().left;
                 int thickness = JBUI.scale(2);
-                underline.fillRect(inset, getHeight() - thickness, getWidth() - inset - getInsets().right, thickness);
+                underline.fillRect(0, getHeight() - thickness, getWidth(), thickness);
             } finally {
                 underline.dispose();
             }
+        }
+    }
+
+    private static void closeWindow(JFrame frame) {
+        if (frame.isDisplayable()) {
+            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         }
     }
 
