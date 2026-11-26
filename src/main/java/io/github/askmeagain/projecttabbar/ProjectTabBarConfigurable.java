@@ -12,6 +12,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
     private final JBCheckBox branchName = new JBCheckBox("include branch name in tab");
     private final JBCheckBox middleClickClose = new JBCheckBox("Allow middle click close");
     private final JBCheckBox closeButton = new JBCheckBox("Add close button");
+    private final JBCheckBox showRunConfiguration = new JBCheckBox("Show Run Configuration");
 
     @Override
     public @NotNull String getDisplayName() {
@@ -25,6 +26,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
                 .addComponent(branchName)
                 .addComponent(middleClickClose)
                 .addComponent(closeButton)
+                .addComponent(showRunConfiguration)
                 .addComponentFillVertically(new javax.swing.JPanel(), 0)
                 .getPanel();
     }
@@ -35,7 +37,8 @@ public final class ProjectTabBarConfigurable implements Configurable {
         return projectName.isSelected() != options.includeProjectName
                 || branchName.isSelected() != options.includeBranchName
                 || middleClickClose.isSelected() != options.allowMiddleClickClose
-                || closeButton.isSelected() != options.addCloseButton;
+                || closeButton.isSelected() != options.addCloseButton
+                || showRunConfiguration.isSelected() != options.showRunConfiguration;
     }
 
     @Override
@@ -45,6 +48,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
         options.includeBranchName = branchName.isSelected();
         options.allowMiddleClickClose = middleClickClose.isSelected();
         options.addCloseButton = closeButton.isSelected();
+        options.showRunConfiguration = showRunConfiguration.isSelected();
     }
 
     @Override
@@ -54,5 +58,6 @@ public final class ProjectTabBarConfigurable implements Configurable {
         branchName.setSelected(options.includeBranchName);
         middleClickClose.setSelected(options.allowMiddleClickClose);
         closeButton.setSelected(options.addCloseButton);
+        showRunConfiguration.setSelected(options.showRunConfiguration);
     }
 }

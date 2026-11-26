@@ -13,6 +13,7 @@ public final class ProjectTabBarSettings implements PersistentStateComponent<Pro
         public boolean includeBranchName = true;
         public boolean allowMiddleClickClose;
         public boolean addCloseButton;
+        public boolean showRunConfiguration = true;
     }
 
     private Options options = new Options();

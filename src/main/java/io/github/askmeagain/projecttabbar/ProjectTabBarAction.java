@@ -1,5 +1,6 @@
 package io.github.askmeagain.projecttabbar;
 
+import com.intellij.execution.ExecutionManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -39,11 +40,12 @@ import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public final class ProjectTabBarAction extends DumbAwareAction implements CustomComponentAction {
-    private record Tab(JFrame frame, String label, String projectName, String path) {}
+    private record Tab(JFrame frame, String label, String projectName, String path, boolean running) {}
 
     @Override
     public JComponent createCustomComponent(Presentation presentation, String place) {
@@ -60,6 +62,10 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
         private final ActionButton newWindowButton = createWorktreeButton();
         private int availableWidth;
         private final Timer timer = new Timer(500, event -> refresh());
+        private final KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        private final PropertyChangeListener activeWindowListener = event -> SwingUtilities.invokeLater(() -> {
+            if (isDisplayable()) refresh();
+        });
         private List<Tab> displayed = List.of();
         private Window selected;
         private boolean closeButtonsDisplayed;
@@ -154,6 +160,7 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
         @Override
         public void addNotify() {
             super.addNotify();
+            focusManager.addPropertyChangeListener("activeWindow", activeWindowListener);
             refresh();
             timer.start();
         }
@@ -161,6 +168,7 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
         @Override
         public void removeNotify() {
             timer.stop();
+            focusManager.removePropertyChangeListener("activeWindow", activeWindowListener);
             super.removeNotify();
         }
 
@@ -176,11 +184,12 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
                 JFrame frame = WindowManager.getInstance().getFrame(project);
                 if (frame != null) {
                     windows.putIfAbsent(frame, new Tab(frame, tabLabel(project, options),
-                            project.getName(), project.getBasePath()));
+                            project.getName(), project.getBasePath(),
+                            options.showRunConfiguration && hasRunningProcess(project)));
                 }
             }
 
-            Window active = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+            Window active = focusManager.getActiveWindow();
             while (active != null && !windows.containsKey(active)) {
                 active = active.getOwner();
             }
@@ -198,6 +207,7 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
             for (Tab tab : tabs) {
                 boolean isActive = tab.frame() == selected;
                 JButton button = new TabButton(tab.label(), closeButtonsDisplayed);
+                if (tab.running()) button.setIcon(AllIcons.Actions.Execute);
                 button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
                 button.getAccessibleContext().setAccessibleName(
                         tab.label().isEmpty() ? tab.projectName() : tab.label());
@@ -256,6 +266,13 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
         }
     }
 
+    private static boolean hasRunningProcess(Project project) {
+        for (var process : ExecutionManager.getInstance(project).getRunningProcesses()) {
+            if (!process.isProcessTerminated()) return true;
+        }
+        return false;
+    }
+
     private static String tabLabel(Project project, ProjectTabBarSettings.Options options) {
         String name = options.includeProjectName ? project.getName() : "";
         if (!options.includeBranchName) return name;
@@ -286,6 +303,11 @@ public final class ProjectTabBarAction extends DumbAwareAction implements Custom
             if (compact) {
                 var insets = getInsets();
                 width = getFontMetrics(getFont()).stringWidth(getText()) + insets.left + insets.right;
+                var icon = getIcon();
+                if (icon != null) {
+                    width += icon.getIconWidth();
+                    if (!getText().isEmpty()) width += getIconTextGap();
+                }
             }
             return new Dimension(width, JBUI.scale(27));
         }
