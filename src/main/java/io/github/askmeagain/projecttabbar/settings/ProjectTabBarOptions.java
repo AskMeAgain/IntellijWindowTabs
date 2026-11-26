@@ -9,4 +9,8 @@ public final class ProjectTabBarOptions {
   public boolean allowMiddleClickClose;
   public boolean addCloseButton;
   public boolean showRunConfiguration = true;
+  public boolean showAirAgentSessionStatus;
+  public boolean showCreateWorktreeButton = true;
 }
+
+

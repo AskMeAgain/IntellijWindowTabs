@@ -66,7 +66,7 @@ final class Tabs extends JPanel {
 
   @Override
   public Dimension getPreferredSize() {
-    var buttonWidth = newWindowButton.getPreferredSize().width;
+    var buttonWidth = newWindowButton.isVisible() ? newWindowButton.getPreferredSize().width : 0;
     var contentWidth = row.getComponentCount() == 0 ? 0 : row.getPreferredSize().width;
     return new Dimension(Math.max(buttonWidth, Math.min(contentWidth + buttonWidth, remainingWidth())),
       JBUI.scale(TOOLBAR_HEIGHT));
@@ -74,7 +74,7 @@ final class Tabs extends JPanel {
 
   @Override
   public Dimension getMinimumSize() {
-    return newWindowButton.getPreferredSize();
+    return newWindowButton.isVisible() ? newWindowButton.getPreferredSize() : new Dimension(0, JBUI.scale(TOOLBAR_HEIGHT));
   }
 
   private ActionButton createWorktreeButton() {
@@ -128,6 +128,7 @@ final class Tabs extends JPanel {
     }
 
     var options = ProjectTabBarSettings.getInstance().getState();
+    newWindowButton.setVisible(options.showCreateWorktreeButton);
     var windows = new LinkedHashMap<JFrame, Tab>();
     for (var project : ProjectManager.getInstance().getOpenProjects()) {
       var frame = WindowManager.getInstance().getFrame(project);
@@ -174,3 +175,4 @@ final class Tabs extends JPanel {
     });
   }
 }
+

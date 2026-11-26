@@ -1,0 +1,6 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="io.github.askmeagain.projecttabbar.air.ProjectTabAirStatusProvider"
+                        serviceImplementation="io.github.askmeagain.projecttabbar.air.AirProjectTabStatusProvider"/>
+    </extensions>
+</idea-plugin>

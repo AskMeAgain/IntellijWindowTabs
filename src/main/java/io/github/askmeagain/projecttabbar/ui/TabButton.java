@@ -24,6 +24,7 @@ final class TabButton extends JButton {
     setContentAreaFilled(false);
     setOpaque(false);
     setRolloverEnabled(true);
+    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
   }
 
   @Override

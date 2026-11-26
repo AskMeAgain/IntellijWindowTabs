@@ -1,6 +1,7 @@
 package io.github.askmeagain.projecttabbar.ui;
 
 import io.github.askmeagain.projecttabbar.branch.ProjectTabBranchProvider;
+import io.github.askmeagain.projecttabbar.air.ProjectTabAirStatusProvider;
 import io.github.askmeagain.projecttabbar.settings.ProjectTabBarOptions;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.openapi.project.Project;
@@ -10,10 +11,16 @@ import javax.swing.JFrame;
 /**
  * Represents a project window and its displayed tab state, with helpers to activate or close the window.
  */
-record Tab(JFrame frame, String label, String projectName, String path, boolean running) {
+record Tab(JFrame frame, String label, String projectName, String path, boolean running, boolean airNeedsAttention) {
   static Tab fromProject(JFrame frame, Project project, ProjectTabBarOptions options) {
     return new Tab(frame, tabLabel(project, options), project.getName(), project.getBasePath(),
-      options.showRunConfiguration && hasRunningProcess(project));
+      options.showRunConfiguration && hasRunningProcess(project),
+      options.showAirAgentSessionStatus && airNeedsAttention(project));
+  }
+
+  private static boolean airNeedsAttention(Project project) {
+    var provider = project.getService(ProjectTabAirStatusProvider.class);
+    return provider != null && provider.needsAttention();
   }
 
   private static boolean hasRunningProcess(Project project) {

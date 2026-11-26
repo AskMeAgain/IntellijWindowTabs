@@ -16,21 +16,25 @@ final class TabPanel extends JPanel {
   private static final int CLOSE_AREA_RIGHT_PADDING = 10;
   private static final int ACTIVE_UNDERLINE_THICKNESS = 2;
 
+  private final TabButton button;
   private final boolean active;
+  private final boolean attention;
+  private final Timer animation = new Timer(40, event -> repaint());
 
   TabPanel(Tab tab, boolean active, boolean closeButtonsDisplayed) {
     super(new BorderLayout());
     this.active = active;
+    this.attention = tab.airNeedsAttention();
     setOpaque(false);
 
-    var button = new TabButton(tab.label(), closeButtonsDisplayed);
+    button = new TabButton(tab.label(), closeButtonsDisplayed);
+
     if (tab.running()) {
       button.setIcon(AllIcons.Actions.Execute);
     }
 
     button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
-    button.getAccessibleContext().setAccessibleName(
-      tab.label().isEmpty() ? tab.projectName() : tab.label());
+    button.getAccessibleContext().setAccessibleName(tab.label().isEmpty() ? tab.projectName() : tab.label());
 
     button.addActionListener(event -> tab.activate());
     var middleClick = new MiddleClickCloseListener(tab);
@@ -41,6 +45,40 @@ final class TabPanel extends JPanel {
 
     if (closeButtonsDisplayed) {
       add(createCloseArea(tab, middleClick), BorderLayout.LINE_END);
+    }
+  }
+
+  @Override
+  public void addNotify() {
+    super.addNotify();
+    if (attention) animation.start();
+  }
+
+  @Override
+  public void removeNotify() {
+    animation.stop();
+    super.removeNotify();
+  }
+
+  @Override
+  protected void paintChildren(Graphics graphics) {
+    super.paintChildren(graphics);
+
+    if (!active && !attention) return;
+
+    var underline = (Graphics2D) graphics.create();
+    try {
+      if (attention) {
+        underline.setColor(button.getForeground());
+        var pulse = (float) (0.5 - 0.5 * Math.cos(System.nanoTime() / 1_000_000_000.0 * Math.PI));
+        underline.setComposite(AlphaComposite.SrcOver.derive(0.7f * pulse));
+      } else {
+        underline.setColor(JBUI.CurrentTheme.EditorTabs.underlineColor());
+      }
+      var thickness = JBUI.scale(ACTIVE_UNDERLINE_THICKNESS);
+      underline.fillRect(0, getHeight() - thickness, getWidth(), thickness);
+    } finally {
+      underline.dispose();
     }
   }
 
@@ -68,20 +106,5 @@ final class TabPanel extends JPanel {
     closeArea.addMouseListener(middleClick);
     closeArea.add(close);
     return closeArea;
-  }
-
-  @Override
-  protected void paintChildren(Graphics graphics) {
-    super.paintChildren(graphics);
-    if (!active) return;
-
-    var underline = graphics.create();
-    try {
-      underline.setColor(JBUI.CurrentTheme.EditorTabs.underlineColor());
-      var thickness = JBUI.scale(ACTIVE_UNDERLINE_THICKNESS);
-      underline.fillRect(0, getHeight() - thickness, getWidth(), thickness);
-    } finally {
-      underline.dispose();
-    }
   }
 }

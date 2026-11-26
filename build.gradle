@@ -21,7 +21,7 @@ dependencies {
         if (localIdePath) {
             local(localIdePath)
         } else {
-            intellijIdea '2026.1'
+            intellijIdea '2026.3'
         }
         bundledPlugin 'Git4Idea'
         bundledModule 'intellij.platform.vcs.dvcs'
