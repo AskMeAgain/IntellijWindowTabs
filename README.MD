@@ -4,6 +4,18 @@ Adds tabs to the toolbar so you can switch between open projects.
 
 ![Project Tab Bar demo in IntelliJ IDEA](./project-tab-bar-demo.gif)
 
+Tabs can show each project's name and current Git branch.
+
+![Project tabs with branch labels](./example.png)
+
+A run icon shows which project has a running configuration, even when you're working in another project.
+
+![Run configuration active in another project tab](./run-configuration-running-in-different-tab.png)
+
+An animated indicator shows when a project's Air agent is waiting for input.
+
+![Air agent waiting indicator in a project tab](./ai-waiting-animation.gif)
+
 ## Settings
 
 Open **Settings → Tools → Project Tab Bar** to configure the tabs. Settings apply to all project windows.
