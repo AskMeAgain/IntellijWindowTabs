@@ -7,6 +7,9 @@ import com.intellij.openapi.project.Project;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
+/**
+ * Represents a project window and its displayed tab state, with helpers to activate or close the window.
+ */
 record Tab(JFrame frame, String label, String projectName, String path, boolean running) {
   static Tab fromProject(JFrame frame, Project project, ProjectTabBarOptions options) {
     return new Tab(frame, tabLabel(project, options), project.getName(), project.getBasePath(),
@@ -22,11 +25,14 @@ record Tab(JFrame frame, String label, String projectName, String path, boolean 
 
   private static String tabLabel(Project project, ProjectTabBarOptions options) {
     var name = options.includeProjectName ? project.getName() : "";
+    
     if (!options.includeBranchName) return name;
 
     var provider = project.getService(ProjectTabBranchProvider.class);
     var branch = provider == null ? "" : provider.getBranchName();
+    
     if (branch.isEmpty()) return name;
+    
     return name.isEmpty() ? branch : name + " | " + branch;
   }
 

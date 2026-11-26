@@ -1,19 +1,22 @@
 package io.github.askmeagain.projecttabbar.ui;
 
-import io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings;
-
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.ui.JBUI;
+import io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings;
+
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Displays open project windows in a scrolling toolbar row and refreshes their labels and active state.
+ */
 final class Tabs extends JPanel {
   private final JPanel row = new JPanel(new FlowLayout(FlowLayout.TRAILING, JBUI.scale(3), JBUI.scale(1)));
   private final JScrollPane viewport = new JScrollPane(row, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -69,8 +72,7 @@ final class Tabs extends JPanel {
   private ActionButton createWorktreeButton() {
     var action = new NewWorktreeAction();
     var size = JBUI.scale(29);
-    return new ActionButton(action, action.getTemplatePresentation().clone(),
-      ActionPlaces.MAIN_TOOLBAR, new Dimension(size, size));
+    return new ActionButton(action, action.getTemplatePresentation().clone(), ActionPlaces.MAIN_TOOLBAR, new Dimension(size, size));
   }
 
   private int remainingWidth() {

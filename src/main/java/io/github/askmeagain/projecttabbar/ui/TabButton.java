@@ -4,6 +4,9 @@ import com.intellij.util.ui.JBUI;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Renders a tab label and optional icon with toolbar sizing and optional compact spacing.
+ */
 final class TabButton extends JButton {
   private final boolean compact;
 

@@ -7,6 +7,9 @@ import com.intellij.openapi.project.DumbAwareAction;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Supplies the project tab bar component for placement in the IDE toolbar.
+ */
 public final class ProjectTabBarAction extends DumbAwareAction implements CustomComponentAction {
   @Override
   public JComponent createCustomComponent(Presentation presentation, String place) {

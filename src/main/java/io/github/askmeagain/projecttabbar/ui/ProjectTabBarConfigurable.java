@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
+/**
+ * Exposes the Project Tab Bar settings page for editing and saving tab display and close options.
+ */
 public final class ProjectTabBarConfigurable implements Configurable {
   private final JBCheckBox projectName = new JBCheckBox("Include project name in tab");
   private final JBCheckBox branchName = new JBCheckBox("Include branch name in tab");

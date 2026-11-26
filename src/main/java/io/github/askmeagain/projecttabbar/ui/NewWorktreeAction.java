@@ -2,12 +2,16 @@ package io.github.askmeagain.projecttabbar.ui;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.ui.Messages;
 
+/**
+ * Invokes the IDE Git worktree creation action for the current project from the tab bar.
+ */
 final class NewWorktreeAction extends AnAction {
   NewWorktreeAction() {
     super("New Worktree", "Create a Git worktree", AllIcons.General.Add);
@@ -24,7 +28,10 @@ final class NewWorktreeAction extends AnAction {
       return;
     }
 
-    var context = SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project).build();
-    action.actionPerformed(AnActionEvent.createFromAnAction(action, null, "ProjectTabBar.Toolbar", context));
+    var context = SimpleDataContext.builder()
+      .add(CommonDataKeys.PROJECT, project)
+      .build();
+    var worktreeEvent = AnActionEvent.createEvent(action, context, null, "ProjectTabBar.Toolbar", ActionUiKind.NONE, null);
+    action.actionPerformed(worktreeEvent);
   }
 }

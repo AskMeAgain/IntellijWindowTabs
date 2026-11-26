@@ -3,9 +3,13 @@ package io.github.askmeagain.projecttabbar.ui;
 import com.intellij.icons.AllIcons;
 import com.intellij.util.ui.JBUI;
 import io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings;
+
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Builds an interactive project tab with activation, optional close controls, and an active underline.
+ */
 final class TabPanel extends JPanel {
   private final boolean active;
 
@@ -15,7 +19,10 @@ final class TabPanel extends JPanel {
     setOpaque(false);
 
     var button = new TabButton(tab.label(), closeButtonsDisplayed);
-    if (tab.running()) button.setIcon(AllIcons.Actions.Execute);
+    if (tab.running()) {
+      button.setIcon(AllIcons.Actions.Execute);
+    }
+
     button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
     button.getAccessibleContext().setAccessibleName(
       tab.label().isEmpty() ? tab.projectName() : tab.label());
