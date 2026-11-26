@@ -11,6 +11,11 @@ import java.awt.*;
  * Builds an interactive project tab with activation, optional close controls, and an active underline.
  */
 final class TabPanel extends JPanel {
+  private static final int CLOSE_BUTTON_EXTRA_WIDTH = 2;
+  private static final int CLOSE_BUTTON_EXTRA_HEIGHT = 4;
+  private static final int CLOSE_AREA_RIGHT_PADDING = 10;
+  private static final int ACTIVE_UNDERLINE_THICKNESS = 2;
+
   private final boolean active;
 
   TabPanel(Tab tab, boolean active, boolean closeButtonsDisplayed) {
@@ -44,8 +49,8 @@ final class TabPanel extends JPanel {
     var close = new JButton(icon);
     close.setBorder(JBUI.Borders.empty());
     close.setBorderPainted(false);
-    close.setPreferredSize(new Dimension(icon.getIconWidth() + JBUI.scale(2),
-      icon.getIconHeight() + JBUI.scale(4)));
+    close.setPreferredSize(new Dimension(icon.getIconWidth() + JBUI.scale(CLOSE_BUTTON_EXTRA_WIDTH),
+      icon.getIconHeight() + JBUI.scale(CLOSE_BUTTON_EXTRA_HEIGHT)));
     close.setContentAreaFilled(false);
 
     close.setToolTipText("Close " + tab.projectName());
@@ -59,7 +64,7 @@ final class TabPanel extends JPanel {
 
     var closeArea = new JPanel(new GridBagLayout());
     closeArea.setOpaque(false);
-    closeArea.setBorder(JBUI.Borders.empty(0, 0, 0, 10));
+    closeArea.setBorder(JBUI.Borders.empty(0, 0, 0, CLOSE_AREA_RIGHT_PADDING));
     closeArea.addMouseListener(middleClick);
     closeArea.add(close);
     return closeArea;
@@ -73,7 +78,7 @@ final class TabPanel extends JPanel {
     var underline = graphics.create();
     try {
       underline.setColor(JBUI.CurrentTheme.EditorTabs.underlineColor());
-      var thickness = JBUI.scale(2);
+      var thickness = JBUI.scale(ACTIVE_UNDERLINE_THICKNESS);
       underline.fillRect(0, getHeight() - thickness, getWidth(), thickness);
     } finally {
       underline.dispose();

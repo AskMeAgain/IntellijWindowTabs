@@ -8,6 +8,10 @@ import java.awt.*;
  * Renders a tab label and optional icon with toolbar sizing and optional compact spacing.
  */
 final class TabButton extends JButton {
+  private static final int COMPACT_LEFT_PADDING = 18;
+  private static final int HORIZONTAL_PADDING = 10;
+  private static final int TAB_HEIGHT = 27;
+
   private final boolean compact;
 
   TabButton(String label, boolean compact) {
@@ -15,7 +19,7 @@ final class TabButton extends JButton {
     this.compact = compact;
 
     setFont(JBUI.CurrentTheme.EditorTabs.font());
-    setBorder(compact ? JBUI.Borders.empty(0, 18, 0, 0) : JBUI.Borders.empty(0, 10));
+    setBorder(compact ? JBUI.Borders.empty(0, COMPACT_LEFT_PADDING, 0, 0) : JBUI.Borders.empty(0, HORIZONTAL_PADDING));
     setBorderPainted(false);
     setContentAreaFilled(false);
     setOpaque(false);
@@ -35,6 +39,6 @@ final class TabButton extends JButton {
         if (!getText().isEmpty()) width += getIconTextGap();
       }
     }
-    return new Dimension(width, JBUI.scale(27));
+    return new Dimension(width, JBUI.scale(TAB_HEIGHT));
   }
 }

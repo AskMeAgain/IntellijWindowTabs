@@ -18,11 +18,19 @@ import java.util.List;
  * Displays open project windows in a scrolling toolbar row and refreshes their labels and active state.
  */
 final class Tabs extends JPanel {
-  private final JPanel row = new JPanel(new FlowLayout(FlowLayout.TRAILING, JBUI.scale(3), JBUI.scale(1)));
+  private static final int TAB_HORIZONTAL_GAP = 3;
+  private static final int TAB_VERTICAL_GAP = 1;
+  private static final int REFRESH_INTERVAL_MS = 500;
+  private static final int SCROLL_UNIT_WIDTH = 16;
+  private static final int TOOLBAR_HEIGHT = 29;
+  private static final int FALLBACK_WIDTH = 180;
+  private static final int TOOLBAR_RESERVED_WIDTH = 40;
+
+  private final JPanel row = new JPanel(new FlowLayout(FlowLayout.TRAILING, JBUI.scale(TAB_HORIZONTAL_GAP), JBUI.scale(TAB_VERTICAL_GAP)));
   private final JScrollPane viewport = new JScrollPane(row, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private final ActionButton newWindowButton = createWorktreeButton();
-  private final Timer timer = new Timer(500, event -> refresh());
+  private final Timer timer = new Timer(REFRESH_INTERVAL_MS, event -> refresh());
   private final KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
   private final PropertyChangeListener activeWindowListener = event -> SwingUtilities.invokeLater(() -> {
     if (isDisplayable()) refresh();
@@ -45,7 +53,7 @@ final class Tabs extends JPanel {
       var view = viewport.getViewport();
       var position = view.getViewPosition();
       var limit = Math.max(0, view.getViewSize().width - view.getExtentSize().width);
-      var next = Math.max(0, Math.min(limit, position.x + event.getUnitsToScroll() * JBUI.scale(16)));
+      var next = Math.max(0, Math.min(limit, position.x + event.getUnitsToScroll() * JBUI.scale(SCROLL_UNIT_WIDTH)));
       if (next != position.x) {
         view.setViewPosition(new Point(next, position.y));
         event.consume();
@@ -61,7 +69,7 @@ final class Tabs extends JPanel {
     var buttonWidth = newWindowButton.getPreferredSize().width;
     var contentWidth = row.getComponentCount() == 0 ? 0 : row.getPreferredSize().width;
     return new Dimension(Math.max(buttonWidth, Math.min(contentWidth + buttonWidth, remainingWidth())),
-      JBUI.scale(29));
+      JBUI.scale(TOOLBAR_HEIGHT));
   }
 
   @Override
@@ -71,19 +79,19 @@ final class Tabs extends JPanel {
 
   private ActionButton createWorktreeButton() {
     var action = new NewWorktreeAction();
-    var size = JBUI.scale(29);
+    var size = JBUI.scale(TOOLBAR_HEIGHT);
     return new ActionButton(action, action.getTemplatePresentation().clone(), ActionPlaces.MAIN_TOOLBAR, new Dimension(size, size));
   }
 
   private int remainingWidth() {
     var section = getParent();
     while (section != null && !(section instanceof ActionToolbar)) section = section.getParent();
-    if (section == null || section.getParent() == null) return JBUI.scale(180);
+    if (section == null || section.getParent() == null) return JBUI.scale(FALLBACK_WIDTH);
 
     var toolbar = section.getParent();
-    if (toolbar.getWidth() == 0) return JBUI.scale(180);
+    if (toolbar.getWidth() == 0) return JBUI.scale(FALLBACK_WIDTH);
 
-    var width = toolbar.getWidth() - JBUI.scale(40);
+    var width = toolbar.getWidth() - JBUI.scale(TOOLBAR_RESERVED_WIDTH);
     for (var sibling : toolbar.getComponents()) {
       if (sibling != section && sibling.isVisible()) width -= sibling.getPreferredSize().width;
     }
