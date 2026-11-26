@@ -13,12 +13,12 @@ import javax.swing.*;
  * Exposes the Project Tab Bar settings page for editing and saving tab display and close options.
  */
 public final class ProjectTabBarConfigurable implements Configurable {
-  private final JBCheckBox showCreateWorktreeButton = new JBCheckBox("Show Create Worktree Button");
+  private final JBCheckBox showCreateWorktreeButton = new JBCheckBox("Show create worktree button");
   private final JBCheckBox projectName = new JBCheckBox("Include project name in tab");
   private final JBCheckBox branchName = new JBCheckBox("Include branch name in tab");
   private final JBCheckBox middleClickClose = new JBCheckBox("Allow middle click close");
   private final JBCheckBox closeButton = new JBCheckBox("Add close button");
-  private final JBCheckBox showAirAgentSessionStatus = new JBCheckBox("Show Air Agent Session Status");
+  private final JBCheckBox showAirAgentSessionStatus = new JBCheckBox("Show air agent session status");
   private final JBCheckBox showRunConfiguration = new JBCheckBox("Show run configuration");
 
   @Override
