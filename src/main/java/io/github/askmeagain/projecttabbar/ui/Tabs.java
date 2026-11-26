@@ -1,56 +1,20 @@
 package io.github.askmeagain.projecttabbar.ui;
 
-import io.github.askmeagain.projecttabbar.branch.ProjectTabBranchProvider;
-import io.github.askmeagain.projecttabbar.settings.ProjectTabBarOptions;
 import io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings;
 
-import com.intellij.execution.ExecutionManager;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.ui.JBUI;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 final class Tabs extends JPanel {
-  private static boolean hasRunningProcess(Project project) {
-    for (var process : ExecutionManager.getInstance(project).getRunningProcesses()) {
-      if (!process.isProcessTerminated()) return true;
-    }
-    return false;
-  }
-
-  private static String tabLabel(Project project, ProjectTabBarOptions options) {
-    var name = options.includeProjectName ? project.getName() : "";
-    if (!options.includeBranchName) return name;
-
-    var provider = project.getService(ProjectTabBranchProvider.class);
-    var branch = provider == null ? "" : provider.getBranchName();
-    if (branch.isEmpty()) return name;
-    return name.isEmpty() ? branch : name + " | " + branch;
-  }
-
-  static void closeWindow(JFrame frame) {
-    if (frame.isDisplayable()) {
-      frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-    }
-  }
-
-  private static void activate(JFrame frame) {
-    if (!frame.isDisplayable()) return;
-    frame.setExtendedState(frame.getExtendedState() & ~JFrame.ICONIFIED);
-    frame.toFront();
-    frame.requestFocus();
-  }
-
   private final JPanel row = new JPanel(new FlowLayout(FlowLayout.TRAILING, JBUI.scale(3), JBUI.scale(1)));
   private final JScrollPane viewport = new JScrollPane(row, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -103,7 +67,7 @@ final class Tabs extends JPanel {
   }
 
   private ActionButton createWorktreeButton() {
-    var action = new NewWorktreeAction(this);
+    var action = new NewWorktreeAction();
     var size = JBUI.scale(29);
     return new ActionButton(action, action.getTemplatePresentation().clone(),
       ActionPlaces.MAIN_TOOLBAR, new Dimension(size, size));
@@ -124,7 +88,7 @@ final class Tabs extends JPanel {
 
     width -= section.getInsets().left + section.getInsets().right;
     for (var sibling : section.getComponents()) {
-      if (sibling != this && sibling.isVisible() && !SwingUtilities.isDescendingFrom(this, sibling)) {
+      if (sibling.isVisible() && !SwingUtilities.isDescendingFrom(this, sibling)) {
         width -= sibling.getPreferredSize().width;
       }
     }
@@ -158,9 +122,7 @@ final class Tabs extends JPanel {
     for (var project : ProjectManager.getInstance().getOpenProjects()) {
       var frame = WindowManager.getInstance().getFrame(project);
       if (frame != null) {
-        windows.putIfAbsent(frame, new Tab(frame, tabLabel(project, options),
-          project.getName(), project.getBasePath(),
-          options.showRunConfiguration && hasRunningProcess(project)));
+        windows.computeIfAbsent(frame, window -> Tab.fromProject(window, project, options));
       }
     }
 
@@ -183,46 +145,7 @@ final class Tabs extends JPanel {
     JComponent activeTab = null;
     for (var tab : tabs) {
       var isActive = tab.frame() == selected;
-      var button = new TabButton(tab.label(), closeButtonsDisplayed);
-      if (tab.running()) button.setIcon(AllIcons.Actions.Execute);
-      button.setToolTipText(tab.path() == null ? tab.projectName() : tab.path());
-      button.getAccessibleContext().setAccessibleName(
-        tab.label().isEmpty() ? tab.projectName() : tab.label());
-
-      button.addActionListener(event -> activate(tab.frame()));
-      var middleClick = new MiddleClickCloseListener(tab.frame());
-      button.addMouseListener(middleClick);
-
-      var tabPanel = new TabPanel(isActive);
-      tabPanel.addMouseListener(middleClick);
-      tabPanel.add(button, BorderLayout.CENTER);
-
-      if (closeButtonsDisplayed) {
-        var icon = AllIcons.Actions.Close;
-        var close = new JButton(icon);
-        close.setBorder(JBUI.Borders.empty());
-        close.setBorderPainted(false);
-        close.setPreferredSize(new Dimension(icon.getIconWidth() + JBUI.scale(2),
-          icon.getIconHeight() + JBUI.scale(4)));
-        close.setContentAreaFilled(false);
-
-        close.setToolTipText("Close " + tab.projectName());
-        close.getAccessibleContext().setAccessibleName(close.getToolTipText());
-        close.addMouseListener(middleClick);
-        close.addActionListener(event -> {
-          if (ProjectTabBarSettings.getInstance().getState().addCloseButton) {
-            closeWindow(tab.frame());
-          }
-        });
-
-        var closeArea = new JPanel(new GridBagLayout());
-        closeArea.setOpaque(false);
-        closeArea.setBorder(JBUI.Borders.empty(0, 0, 0, 10));
-        closeArea.addMouseListener(middleClick);
-        closeArea.add(close);
-        tabPanel.add(closeArea, BorderLayout.LINE_END);
-      }
-
+      var tabPanel = new TabPanel(tab, isActive, closeButtonsDisplayed);
       row.add(tabPanel);
       if (isActive) activeTab = tabPanel;
     }
