@@ -14,6 +14,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
     intellijPlatform {
         def localIdePath = providers.gradleProperty('localIdePath').orNull
         if (localIdePath) {

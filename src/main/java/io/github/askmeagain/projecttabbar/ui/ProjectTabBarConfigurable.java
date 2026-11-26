@@ -1,4 +1,6 @@
-package io.github.askmeagain.projecttabbar;
+package io.github.askmeagain.projecttabbar.ui;
+
+import io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.components.JBCheckBox;
@@ -34,6 +36,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
   @Override
   public boolean isModified() {
     var options = ProjectTabBarSettings.getInstance().getState();
+
     return projectName.isSelected() != options.includeProjectName
       || branchName.isSelected() != options.includeBranchName
       || middleClickClose.isSelected() != options.allowMiddleClickClose
@@ -44,6 +47,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
   @Override
   public void apply() {
     var options = ProjectTabBarSettings.getInstance().getState();
+
     options.includeProjectName = projectName.isSelected();
     options.includeBranchName = branchName.isSelected();
     options.allowMiddleClickClose = middleClickClose.isSelected();
@@ -54,6 +58,7 @@ public final class ProjectTabBarConfigurable implements Configurable {
   @Override
   public void reset() {
     var options = ProjectTabBarSettings.getInstance().getState();
+
     projectName.setSelected(options.includeProjectName);
     branchName.setSelected(options.includeBranchName);
     middleClickClose.setSelected(options.allowMiddleClickClose);

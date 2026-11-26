@@ -12,14 +12,14 @@
     <depends optional="true" config-file="project-tab-bar-git.xml">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="io.github.askmeagain.projecttabbar.ProjectTabBarSettings"/>
+        <applicationService serviceImplementation="io.github.askmeagain.projecttabbar.settings.ProjectTabBarSettings"/>
         <applicationConfigurable parentId="tools" id="io.github.askmeagain.projecttabbar.settings"
                                  displayName="Project Tab Bar"
-                                 instance="io.github.askmeagain.projecttabbar.ProjectTabBarConfigurable"/>
+                                 instance="io.github.askmeagain.projecttabbar.ui.ProjectTabBarConfigurable"/>
     </extensions>
 
     <actions>
-        <action id="ProjectTabBar.ProjectWindows" class="io.github.askmeagain.projecttabbar.ProjectTabBarAction" text="Project Tab Bar">
+        <action id="ProjectTabBar.ProjectWindows" class="io.github.askmeagain.projecttabbar.ui.ProjectTabBarAction" text="Project Tab Bar">
             <add-to-group group-id="MainToolbarCenter" anchor="first"/>
         </action>
     </actions>

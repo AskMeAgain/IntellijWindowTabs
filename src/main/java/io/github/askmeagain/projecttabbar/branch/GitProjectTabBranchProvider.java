@@ -1,4 +1,4 @@
-package io.github.askmeagain.projecttabbar;
+package io.github.askmeagain.projecttabbar.branch;
 
 import com.intellij.dvcs.repo.Repository;
 import com.intellij.openapi.project.Project;
@@ -7,12 +7,9 @@ import git4idea.repo.GitRepositoryManager;
 
 import java.util.Comparator;
 
+@lombok.RequiredArgsConstructor
 public final class GitProjectTabBranchProvider implements ProjectTabBranchProvider {
   private final Project project;
-
-  public GitProjectTabBranchProvider(Project project) {
-    this.project = project;
-  }
 
   @Override
   public String getBranchName() {
