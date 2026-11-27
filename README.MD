@@ -1,5 +1,7 @@
 # Project Tab Bar for IntelliJ IDEA
 
+Can be added via the marketplace or from here: https://plugins.jetbrains.com/plugin/36474-project-tab-bar
+
 Adds tabs to the toolbar so you can switch between open projects.
 
 ![Project Tab Bar demo in IntelliJ IDEA](./project-tab-bar-demo.gif)
